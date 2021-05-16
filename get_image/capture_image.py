@@ -3,7 +3,7 @@ import time
 import datetime
 import cv2
 
-def main():
+def captureImage():
     time.sleep(1)
     # Raspy Camera Module
     """
@@ -21,15 +21,20 @@ def main():
     ret, img = cap.read()
 
     # picture filename
-    current_path = os.getcwd()
     date_info = datetime.datetime.now()
     img_date_info = "{}-{:02}{:02}-{:02}{:02}".format(date_info.year, date_info.month, date_info.day, date_info.hour, date_info.minute)
-    print(img_date_info)
-    pic_name = 'pic_{}.jpg'.format(img_date_info)
-    pic_name = os.path.join(current_path, 'images', pic_name)
+    img_name = 'pic_{}.jpg'.format(img_date_info)
 
-    cv2.imwrite(pic_name, img)
-    del(cap)
+    current_path = os.getcwd()
+    img_dir = os.path.join(current_path, 'images')
+    if os.path.isdir(img_dir) == False:
+        os.mkdir(img_dir)
+    
+    img_path = os.path.join(img_dir, img_name)
+    cv2.imwrite(img_path, img)
+    
+    return img_path
 
 if __name__ == "__main__":
-    main()
+    img_path = captureImage()
+    print(img_path)
