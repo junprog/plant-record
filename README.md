@@ -34,14 +34,11 @@
 
 取得画像を通知する。
 
-- 通知      : Slack + incoming-webhook, Twitter
-
-- tweetInfo()
-return: res["entities"]["media"]["expanded_url"]
+- 通知      : Twitter, Slack + incoming-webhook
 
 ```bash
-$ sh setup_notify_twitter.sh
-$ python3 tweet_test.py
+$ sh setup_notify_twitter.sh # config 作成 → twitter, slackのconfigを各自入力
+$ python3 notify_test.py
 ```
 
 <a id="segmentation"></a>
