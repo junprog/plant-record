@@ -7,11 +7,14 @@
 - python 3.6
     - opencv-python
     - (pytorch)
+    - requests (twitter api用)
+    - requests-oauthlib (twitter api用)
 - USB Web Camera (RasberryPi Camera Moduleは画質、色彩が悪かった)
 
 ## Features
 
 - [getImage](#getImage)
+- [notify](#notify)
 - [segmentation](#segmentation)
 - [recognizeDiff](#recognizeDiff)
 - [GUI](#GUI)
@@ -20,11 +23,26 @@
 
 ### getImage
 
-1日に1,2枚植物画像を取得し、取得画像を通知する。
+1日に1,2枚植物画像を取得する。
 
 - 定期処理  : cron
 - 画像取得  : python + opencv-python
+
+<a id="notify"></a>
+
+### notify
+
+取得画像を通知する。
+
 - 通知      : Slack + incoming-webhook, Twitter
+
+- tweetInfo()
+return: res["entities"]["media"]["expanded_url"]
+
+```bash
+$ sh setup_notify_twitter.sh
+$ python3 tweet_test.py
+```
 
 <a id="segmentation"></a>
 

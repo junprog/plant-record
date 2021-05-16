@@ -21,10 +21,12 @@ def main():
     ret, img = cap.read()
 
     # picture filename
-    path = os.getcwd()
+    current_path = os.getcwd()
     date_info = datetime.datetime.now()
-    pic_name = 'pic_{}.jpg'.format(date_info.isoformat()[0:16])
-    pic_name = os.path.join(path, 'images', pic_name)
+    img_date_info = "{}-{:02}{:02}-{:02}{:02}".format(date_info.year, date_info.month, date_info.day, date_info.hour, date_info.minute)
+    print(img_date_info)
+    pic_name = 'pic_{}.jpg'.format(img_date_info)
+    pic_name = os.path.join(current_path, 'images', pic_name)
 
     cv2.imwrite(pic_name, img)
     del(cap)
