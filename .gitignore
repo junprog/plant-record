@@ -1,6 +1,9 @@
 # Option
 images/
 
+# Ignore twitter api token
+#get_image/notify/twitter/config.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
