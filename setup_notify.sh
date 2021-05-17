@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 ## 追跡対象外のTwitter APIのconfigを作成
 TWITTER_CONF_FILE="notify/twitter/twitter_api_config.py"
