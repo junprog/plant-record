@@ -2,14 +2,18 @@
 植物の成長記録を全自動で行おう。成長差分の認識もしたいな。成長の統計の可視化もしたいな。目指せ publish
 
 ## Environment
-
-- jetson nano (Ubuntu 16.04 LTS)
+### Jetson nano (Ubuntu 16.04 LTS)
+- cron
 - python 3.6
     - opencv-python
     - (pytorch)
-    - requests (twitter api用)
-    - requests-oauthlib (twitter api用)
+    - requests (api用)
+    - requests-oauthlib (api用)
 - USB Web Camera (RasberryPi Camera Moduleは画質、色彩が悪かった)
+
+### Docker [jetson pytorch image](https://ngc.nvidia.com/catalog/containers/nvidia:l4t-pytorch) (Ubuntu 18.04.5 LTS)
+- cron
+- Python 3.6.9
 
 ## Features
 
