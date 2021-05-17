@@ -56,8 +56,12 @@ def tweetInfo(image_filepath=None):
         else: #正常投稿出来なかった場合
             print("Failed. : %d"% res.status_code)
 
-        return res.text
+        # 投稿したURLを返す
+        res_dict = json.loads(res.text)
+        twitter_url = res_dict["entities"]["media"][0]["expanded_url"]
 
+        return twitter_url
+        
     else:
         print("画像ファイルが存在しません")
         return None
