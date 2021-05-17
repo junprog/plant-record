@@ -1,3 +1,13 @@
+# Option
+images/
+
+# Ignore twitter api token
+notify/twitter/twitter_api_config.py
+notify/twitter/twiiter_response.txt
+
+# Ignore slack webhook URL
+notify/slack/slack_webhook_config.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
