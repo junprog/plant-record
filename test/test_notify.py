@@ -1,7 +1,7 @@
 import sys
 import os
 current_path = os.getcwd()
-sys.path.append(current_path)
+sys.path.append(current_path) # /plant-record/ ディレクトリをパスに追加
 
 import json
 import notify
