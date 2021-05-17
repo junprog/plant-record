@@ -1,3 +1,8 @@
+import sys
+import os
+current_path = os.getcwd()
+sys.path.append(current_path)
+
 import json
 import notify
 
