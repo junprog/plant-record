@@ -1,0 +1,1 @@
+*/1 * * * * cd /home/junya/Documents/plant-record; /usr/bin/python3 /home/junya/Documents/plant-record/main_flow.py
