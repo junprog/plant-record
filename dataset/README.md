@@ -1,1 +1,3 @@
 # datasetを作るためのディレクトリ
+
+pythonでGoogleから植物画像をスクレイピング
