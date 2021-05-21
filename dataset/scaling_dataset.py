@@ -24,11 +24,12 @@ def parse_args():
 def scaling_img(img):
     min_axis = np.argmin(img.shape[:2])
     h, w = img.shape[:2]
-    new_edge = round(w * (MIN_EDGE / h))
 
     if min_axis == 0:
+        new_edge = round(w * (MIN_EDGE / h))
         out = cv2.resize(img, dsize=(new_edge, MIN_EDGE))
     elif min_axis == 1:
+        new_edge = round(h * (MIN_EDGE / w))
         out = cv2.resize(img, dsize=(MIN_EDGE, new_edge))
 
     return out
