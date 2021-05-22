@@ -1,6 +1,6 @@
 """
-画像の短辺を 256 [px] とした等方スケール変換を行う。
-(e.g.) 1000 x 2000 -> 256 x 512
+画像の短辺を X [px] とした等方スケール変換を行う。
+(e.g.) 1000 x 2000 -> X x (2000 * X)/1000
 """
 
 import os
@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 import argparse
 
-MIN_EDGE = 256
+MIN_EDGE = 512
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Test ')
