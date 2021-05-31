@@ -5,7 +5,7 @@
 
 - jetson nano (Ubuntu 16.04 LTS)
 - python 3.6
-    - opencv-python
+    - opencv-python ()
     - tensorflow == 2.3.1
     - requests (api用)
     - requests-oauthlib (api用)
