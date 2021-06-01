@@ -1,0 +1,6 @@
+C:/Users/junya/Documents/plant_segmentation_data\train\32.jpg
+C:/Users/junya/Documents/plant_segmentation_data\train\20210521_184248787_iOS.jpg
+C:/Users/junya/Documents/plant_segmentation_data\train\17.jpg
+C:/Users/junya/Documents/plant_segmentation_data\train\13.jpg
+C:/Users/junya/Documents/plant_segmentation_data\train\20210521_184306911_iOS.jpg
+C:/Users/junya/Documents/plant_segmentation_data\train\14.jpg

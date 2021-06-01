@@ -1,3 +1,6 @@
+"""
+labelme で作成したjsonファイルをpngにして*_mask.pngというファイル名で保存
+"""
 import os
 import glob
 import json
