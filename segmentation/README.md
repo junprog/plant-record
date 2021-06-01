@@ -7,3 +7,8 @@
 ## 使用モデル
 
 ## 学習, 検証結果
+
+## メモ
+
+* generate_maskdata.py
+    * ground truthのpngファイル作成
