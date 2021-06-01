@@ -66,9 +66,9 @@ if __name__ == '__main__':
     tr_ds = create_dataset(tr_list, tr_mask_list, phase='train')
     vl_ds = create_dataset(vl_list, vl_mask_list, phase='val')
 
-    plt.figure(figsize=(16,16))
+    plt.figure(figsize=(10,10))
 
-    N = 16
+    N = 4
     for n,(image, mask) in enumerate(tr_ds.take(N)):
         plt.subplot(2,N,2*n+1)
         plt.imshow(image)
