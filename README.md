@@ -11,6 +11,7 @@
     - requests (api用)
     - requests-oauthlib (api用)
     - labelme (アノテーション用)
+
 - USB Web Camera (RasberryPi Camera Moduleは画質、色彩が悪かった)
 
 ## Features
