@@ -1,12 +1,23 @@
-import matplotlib.pyplot as plt
+import os
+import argparse
+from glob import glob
+
 import numpy as np
+import matplotlib.pyplot as plt
+
 import tensorflow as tf
 from tensorflow.keras.layers import *
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
-from glob import glob
-import os
 
+def parse_args():
+    parser = argparse.ArgumentParser(description='Test ')
+    parser.add_argument('--data-dir', default='D:/Junya/Documents/plant_segmentation_data',
+                        help='dataset directory')
+    parser.add_argument('--result-dir', default='D:/Junya/Documents/plant-record-res',
+                        help='result directory')
+    args = parser.parse_args()
+    return args
 
 def parse_image(img_path: str) -> dict:
     img = tf.io.read_file(img_path)
@@ -71,7 +82,7 @@ def show_predictions(dataset=None, num=1):
     if dataset:
         for image, mask in dataset.take(num):
             pred_mask = model.predict(image)
-            display_sample([image[0], true_mask, create_mask(pred_mask)])
+            display_sample([image[0], mask[0], create_mask(pred_mask)])
     else:
         # The model is expecting a tensor of the size
         # [BATCH_SIZE, IMG_SIZE, IMG_SIZE, 3]
@@ -99,7 +110,6 @@ def display_sample(display_list):
         plt.imshow(tf.keras.preprocessing.image.array_to_img(display_list[i]))
         plt.axis('off')
     plt.show()
-
 
 if __name__ == '__main__':
 
