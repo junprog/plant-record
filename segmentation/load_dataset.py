@@ -1,7 +1,11 @@
-import matplotlib.pyplot as plt
+import os
+from glob import glob
+
 import numpy as np
 import tensorflow as tf
-from glob import glob
+import matplotlib.pyplot as plt
+
+IMG_SIZE = 128
 
 def parse_image(img_path: str) -> dict:
     img = tf.io.read_file(img_path)
@@ -53,22 +57,50 @@ def load_image_test(datapoint: dict) -> tuple:
 
     return input_image, input_mask
 
-def display_sample(display_list):
+## IMG_SIZE のスコープ問題
+def create_dataset(data_path, img_size, batch_size, seed=30):
 
-    plt.figure(figsize=(18, 18))
+    training_data = os.path.join(data_path, 'train')
+    test_data = os.path.join(data_path, 'test')
+    
+    TRAINSET_SIZE = len(glob(os.path.join(training_data, "*.jpg")))
+    print(f"The Training Dataset contains {TRAINSET_SIZE} images.")
+    TESTSET_SIZE = len(glob(os.path.join(test_data, "*.jpg")))
+    print(f"The Test Dataset contains {TESTSET_SIZE} images.")
 
-    title = ['Input Image', 'True Mask', 'Predicted Mask']
+    # TODO:configファイル
+    SEED = seed
+    IMG_SIZE = img_size
+    BATCH_SIZE = batch_size
 
-    for i in range(len(display_list)):
-        plt.subplot(1, len(display_list), i+1)
-        plt.title(title[i])
-        plt.imshow(tf.keras.preprocessing.image.array_to_img(display_list[i]))
-        plt.axis('off')
-    plt.show()
+    AUTOTUNE = tf.data.experimental.AUTOTUNE
+    # print(f"Tensorflow ver. {tf.__version__}")
 
+    train_dataset = tf.data.Dataset.list_files(os.path.join(training_data, "*.jpg"), seed=SEED)
+    train_dataset = train_dataset.map(parse_image)
+    test_dataset = tf.data.Dataset.list_files(os.path.join(test_data, "*.jpg"), seed=SEED)
+    test_dataset =test_dataset.map(parse_image)
 
+    dataset = {"train": train_dataset, "test": test_dataset}
+
+    # シャッフルバッファのサイズをデータセットとおなじに設定することで、データが完全にシャッフルされる
+    BUFFER_SIZE = TRAINSET_SIZE
+
+    dataset['train'] = dataset['train'].map(load_image_train, num_parallel_calls=tf.data.experimental.AUTOTUNE)
+    dataset['train'] = dataset['train'].shuffle(buffer_size=BUFFER_SIZE, seed=SEED)
+    dataset['train'] = dataset['train'].repeat()
+    dataset['train'] = dataset['train'].batch(BATCH_SIZE)
+    dataset['train'] = dataset['train'].prefetch(buffer_size=AUTOTUNE)
+
+    dataset['test'] = dataset['test'].map(load_image_test)
+    dataset['test'] = dataset['test'].repeat()
+    dataset['test'] = dataset['test'].batch(1)
+    dataset['test'] = dataset['test'].prefetch(buffer_size=AUTOTUNE)
+
+    return dataset
+
+"""
 if __name__ == '__main__':
-
     training_data = 'train/'
     test_data = 'test/'
     
@@ -111,3 +143,4 @@ if __name__ == '__main__':
         sample_image, sample_mask = image, mask
 
     display_sample([sample_image[0], sample_mask[0]])
+"""

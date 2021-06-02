@@ -1,5 +1,7 @@
 import os
+import sys
 import argparse
+from datetime import datetime
 from glob import glob
 
 import numpy as np
@@ -10,12 +12,23 @@ from tensorflow.keras.layers import *
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
 
+current_path = os.getcwd()
+sys.path.append(current_path) # /plant-record/ ディレクトリをパスに追加
+from segmentation.models.unet import unet
+
 def parse_args():
-    parser = argparse.ArgumentParser(description='Test ')
+    parser = argparse.ArgumentParser(description='Training Segmentation Model')
     parser.add_argument('--data-dir', default='D:/Junya/Documents/plant_segmentation_data',
                         help='dataset directory')
     parser.add_argument('--result-dir', default='D:/Junya/Documents/plant-record-res',
                         help='result directory')
+
+    parser.add_argument('--gpu', action='store_true',
+                    help='use GPU')
+
+    parser.add_argument('--model-arch', default='unet',
+                    help='model architecture [unet, ]')
+
     args = parser.parse_args()
     return args
 
@@ -100,7 +113,7 @@ def show_predictions(dataset=None, num=1):
 
 def display_sample(display_list):
 
-    plt.figure(figsize=(18, 18))
+    plt.figure(figsize=(10, 10))
 
     title = ['Input Image', 'True Mask', 'Predicted Mask']
 
@@ -113,12 +126,14 @@ def display_sample(display_list):
 
 if __name__ == '__main__':
 
-    training_data = 'train/'
-    test_data = 'test/'
+    args = parse_args()
+
+    training_data = os.path.join(args.data_dir, 'train')
+    test_data = os.path.join(args.data_dir, 'test')
     
-    TRAINSET_SIZE = len(glob(training_data + "*.jpg"))
+    TRAINSET_SIZE = len(glob(os.path.join(training_data, "*.jpg")))
     print(f"The Training Dataset contains {TRAINSET_SIZE} images.")
-    TESTSET_SIZE = len(glob(test_data + "*.jpg"))
+    TESTSET_SIZE = len(glob(os.path.join(test_data, "*.jpg")))
     print(f"The Test Dataset contains {TESTSET_SIZE} images.")
 
     # TODO:configファイル
@@ -126,14 +141,14 @@ if __name__ == '__main__':
     IMG_SIZE = 128
     N_CHANNELS = 3
     BATCH_SIZE = 1
-    N_CLASSES = 151
+    N_CLASSES = 4
 
     AUTOTUNE = tf.data.experimental.AUTOTUNE
     # print(f"Tensorflow ver. {tf.__version__}")
 
-    train_dataset = tf.data.Dataset.list_files(training_data + "*.jpg", seed=SEED)
+    train_dataset = tf.data.Dataset.list_files(os.path.join(training_data, "*.jpg"), seed=SEED)
     train_dataset = train_dataset.map(parse_image)
-    test_dataset = tf.data.Dataset.list_files(test_data + "*.jpg", seed=SEED)
+    test_dataset = tf.data.Dataset.list_files(os.path.join(test_data, "*.jpg"), seed=SEED)
     test_dataset =test_dataset.map(parse_image)
 
 
@@ -158,75 +173,13 @@ if __name__ == '__main__':
 
     display_sample([sample_image[0], sample_mask[0]])
 
-    '''
-    モデルは別ファイルで定義したい
-    '''
     # -- Keras Functional API -- #
     # -- UNet Implementation -- #
     dropout_rate = 0.5
     input_size = (IMG_SIZE, IMG_SIZE, N_CHANNELS)
-    
-    initializer = 'he_normal'
+    num_classes = N_CLASSES
 
-    # -- Encoder -- #
-    # Block encoder 1
-    inputs = Input(shape=input_size)
-    conv_enc_1 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=initializer)(inputs)
-    conv_enc_1 = Conv2D(64, 3, activation = 'relu', padding='same', kernel_initializer=initializer)(conv_enc_1)
-
-    # Block encoder 2
-    max_pool_enc_2 = MaxPooling2D(pool_size=(2, 2))(conv_enc_1)
-    conv_enc_2 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(max_pool_enc_2)
-    conv_enc_2 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_enc_2)
-
-    # Block  encoder 3
-    max_pool_enc_3 = MaxPooling2D(pool_size=(2, 2))(conv_enc_2)
-    conv_enc_3 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(max_pool_enc_3)
-    conv_enc_3 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_enc_3)
-
-    # Block  encoder 4
-    max_pool_enc_4 = MaxPooling2D(pool_size=(2, 2))(conv_enc_3)
-    conv_enc_4 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(max_pool_enc_4)
-    conv_enc_4 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_enc_4)
-    # -- Encoder -- #
-
-    # ----------- #
-    maxpool = MaxPooling2D(pool_size=(2, 2))(conv_enc_4)
-    conv = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(maxpool)
-    conv = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv)
-    # ----------- #
-
-    # -- Decoder -- #
-    # Block decoder 1
-    up_dec_1 = Conv2D(512, 2, activation = 'relu', padding = 'same', kernel_initializer = initializer)(UpSampling2D(size = (2,2))(conv))
-    merge_dec_1 = concatenate([conv_enc_4, up_dec_1], axis = 3)
-    conv_dec_1 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(merge_dec_1)
-    conv_dec_1 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_1)
-
-    # Block decoder 2
-    up_dec_2 = Conv2D(256, 2, activation = 'relu', padding = 'same', kernel_initializer = initializer)(UpSampling2D(size = (2,2))(conv_dec_1))
-    merge_dec_2 = concatenate([conv_enc_3, up_dec_2], axis = 3)
-    conv_dec_2 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(merge_dec_2)
-    conv_dec_2 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_2)
-
-    # Block decoder 3
-    up_dec_3 = Conv2D(128, 2, activation = 'relu', padding = 'same', kernel_initializer = initializer)(UpSampling2D(size = (2,2))(conv_dec_2))
-    merge_dec_3 = concatenate([conv_enc_2, up_dec_3], axis = 3)
-    conv_dec_3 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(merge_dec_3)
-    conv_dec_3 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_3)
-
-    # Block decoder 4
-    up_dec_4 = Conv2D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = initializer)(UpSampling2D(size = (2,2))(conv_dec_3))
-    merge_dec_4 = concatenate([conv_enc_1, up_dec_4], axis = 3)
-    conv_dec_4 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(merge_dec_4)
-    conv_dec_4 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_4)
-    conv_dec_4 = Conv2D(2, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_4)
-    # -- Dencoder -- #
-
-    output = Conv2D(N_CLASSES, 1, activation = 'softmax')(conv_dec_4)
-
-
-    model = tf.keras.Model(inputs = inputs, outputs = output)
+    model = unet(input_size, num_classes=num_classes)
     model.compile(optimizer=Adam(learning_rate=0.0001), loss = tf.keras.losses.SparseCategoricalCrossentropy(),
                 metrics=['accuracy'])
 
@@ -235,30 +188,41 @@ if __name__ == '__main__':
 
     show_predictions()
 
-
     EPOCHS = 1
 
     STEPS_PER_EPOCH = TRAINSET_SIZE // BATCH_SIZE
     VALIDATION_STEPS = TESTSET_SIZE // BATCH_SIZE
 
-    checkpoint_path = "training_1/cp.ckpt"
-    checkpoint_dir = os.path.dirname(checkpoint_path)
+    checkpoint_name = "cp.ckpt"
+    
+    ### 結果出力ディレクトリ作成 ###
+    if not os.path.isdir(args.result_dir):
+        os.mkdir(args.result_dir)
+
+    save_dir = datetime.strftime(datetime.now(), '%m%d-%H%M%S')
+    save_dir = save_dir + '-{}'.format(args.model_arch)
+    save_dir = os.path.join(args.result_dir, save_dir)
+    os.mkdir(save_dir)
+
+    checkpoint_path = os.path.join(save_dir, checkpoint_name)
 
     # チェックポイントコールバックを作る
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, 
                                                     save_weights_only=True,
                                                     verbose=1)
-
-    # On CPU
-    with tf.device("/cpu:0"):
+    
+    if args.gpu:
+        # On GPU
         model_history = model.fit(dataset['train'], epochs=EPOCHS,
                                 steps_per_epoch=STEPS_PER_EPOCH,
                                 validation_steps=VALIDATION_STEPS,
-                                validation_data=dataset['test'],
-                                callbacks=[cp_callback])
+                                validation_data=dataset['test'])
 
-    # On GPU
-    # model_history = model.fit(dataset['train'], epochs=EPOCHS,
-    #                           steps_per_epoch=STEPS_PER_EPOCH,
-    #                           validation_steps=VALIDATION_STEPS,
-    #                           validation_data=dataset['test'])
+    else:
+        # On CPU
+        with tf.device("/cpu:0"):
+            model_history = model.fit(dataset['train'], epochs=EPOCHS,
+                                    steps_per_epoch=STEPS_PER_EPOCH,
+                                    validation_steps=VALIDATION_STEPS,
+                                    validation_data=dataset['test'],
+                                    callbacks=[cp_callback])
