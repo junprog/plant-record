@@ -43,7 +43,7 @@ def save_np2png(np_array, save_path):
             save_path: 保存するpngのパス+ファイル名
     """
     assert not os.path.exists(save_path), "指定したファイル名{}は存在します。".format(save_path)
-
+    print(save_path)
     image = Image.fromarray(np_array)
     image.save(save_path)
 

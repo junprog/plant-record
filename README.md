@@ -11,6 +11,7 @@
     - requests (api用)
     - requests-oauthlib (api用)
     - labelme (アノテーション用)
+        - `pip install labelme` で`pyqt`が入らなったら`conda install pyqt`で入れる 
 
 - USB Web Camera (RasberryPi Camera Moduleは画質、色彩が悪かった)
 
