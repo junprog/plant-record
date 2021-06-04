@@ -1,4 +1,5 @@
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import sys
 import argparse
 from datetime import datetime
@@ -18,9 +19,9 @@ from segmentation.models.unet import unet
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Training Segmentation Model')
-    parser.add_argument('--data-dir', default='D:/Junya/Documents/plant_segmentation_data',
+    parser.add_argument('--data-dir', default='C:/Users/Yoshimoto/Downloads/plant_segmentation_data',
                         help='dataset directory')
-    parser.add_argument('--result-dir', default='D:/Junya/Documents/plant-record-res',
+    parser.add_argument('--result-dir', default='C:/Users/Yoshimoto/Documents/plant-record-res',
                         help='result directory')
 
     parser.add_argument('--gpu', action='store_true',
@@ -109,7 +110,9 @@ def show_predictions(dataset=None, num=1):
         pred_mask = create_mask(inference)
         # pred_mask -> [1, IMG_SIZE, IMG_SIZE, 1]
         display_sample([sample_image[0], sample_mask[0],
-                        pred_mask[0]])
+                        pred_mask[0
+                        ]])
+
 
 def display_sample(display_list):
 
@@ -171,7 +174,7 @@ if __name__ == '__main__':
     for image, mask in dataset['train'].take(1):
         sample_image, sample_mask = image, mask
 
-    display_sample([sample_image[0], sample_mask[0]])
+#    display_sample([sample_image[0], sample_mask[0]])
 
     # -- Keras Functional API -- #
     # -- UNet Implementation -- #
@@ -180,15 +183,16 @@ if __name__ == '__main__':
     num_classes = N_CLASSES
 
     model = unet(input_size, num_classes=num_classes)
-    model.compile(optimizer=Adam(learning_rate=0.0001), loss = tf.keras.losses.SparseCategoricalCrossentropy(),
+    model.compile(optimizer=Adam(learning_rate=0.0001), loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
                 metrics=['accuracy'])
+    model.summary()
 
     for image, mask in dataset['train'].take(1):
         sample_image, sample_mask = image, mask
 
-    show_predictions()
-
+#    show_predictions()
     EPOCHS = 1
+
 
     STEPS_PER_EPOCH = TRAINSET_SIZE // BATCH_SIZE
     VALIDATION_STEPS = TESTSET_SIZE // BATCH_SIZE
@@ -221,8 +225,10 @@ if __name__ == '__main__':
     else:
         # On CPU
         with tf.device("/cpu:0"):
+            print("CPU\n\n\n")
             model_history = model.fit(dataset['train'], epochs=EPOCHS,
                                     steps_per_epoch=STEPS_PER_EPOCH,
                                     validation_steps=VALIDATION_STEPS,
-                                    validation_data=dataset['test'],
-                                    callbacks=[cp_callback])
+                                    validation_data=dataset['test'])#,
+                                    #callbacks=[cp_callback])
+    

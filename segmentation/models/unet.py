@@ -67,6 +67,8 @@ def unet(input_shape, num_classes=4):
     conv_dec_4 = Conv2D(2, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_4)
     # -- Dencoder -- #
 
-    output = Conv2D(num_classes, 1, activation = 'softmax')(conv_dec_4)
+#    output = Conv2D(num_classes, 1, activation = 'softmax')(conv_dec_4)
+    output = Conv2D(num_classes, 1)(conv_dec_4)
+    outputs = tf.keras.layers.Softmax(axis=2)(output)
 
-    return tf.keras.Model(inputs = inputs, outputs = output)
+    return tf.keras.Model(inputs = inputs, outputs = outputs)
