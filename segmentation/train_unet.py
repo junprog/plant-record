@@ -16,6 +16,7 @@ from tensorflow.keras.optimizers import Adam
 current_path = os.getcwd()
 sys.path.append(current_path) # /plant-record/ ディレクトリをパスに追加
 from segmentation.models.unet import unet
+from segmentation.load_dataset import create_dataset
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Training Segmentation Model')
@@ -33,6 +34,7 @@ def parse_args():
     args = parser.parse_args()
     return args
 
+"""
 def parse_image(img_path: str) -> dict:
     img = tf.io.read_file(img_path)
     img = tf.image.decode_jpeg(img, channels=3)
@@ -82,6 +84,7 @@ def load_image_test(datapoint: dict) -> tuple:
     input_image, input_mask = normalize(input_image, input_mask)
 
     return input_image, input_mask
+"""
 
 def create_mask(pred_mask: tf.Tensor) -> tf.Tensor:
 
@@ -131,45 +134,19 @@ if __name__ == '__main__':
 
     args = parse_args()
 
-    training_data = os.path.join(args.data_dir, 'train')
-    test_data = os.path.join(args.data_dir, 'test')
-    
-    TRAINSET_SIZE = len(glob(os.path.join(training_data, "*.jpg")))
-    print(f"The Training Dataset contains {TRAINSET_SIZE} images.")
-    TESTSET_SIZE = len(glob(os.path.join(test_data, "*.jpg")))
-    print(f"The Test Dataset contains {TESTSET_SIZE} images.")
-
-    # TODO:configファイル
     SEED = 30
-    IMG_SIZE = 128
+    IMG_SIZE = 448
     N_CHANNELS = 3
     BATCH_SIZE = 1
     N_CLASSES = 4
 
-    AUTOTUNE = tf.data.experimental.AUTOTUNE
-    # print(f"Tensorflow ver. {tf.__version__}")
+    training_data = os.path.join(args.data_dir, 'train')
+    test_data = os.path.join(args.data_dir, 'test')
+    
+    TRAINSET_SIZE = len(glob(os.path.join(training_data, "*.jpg")))
+    TESTSET_SIZE = len(glob(os.path.join(test_data, "*.jpg")))
 
-    train_dataset = tf.data.Dataset.list_files(os.path.join(training_data, "*.jpg"), seed=SEED)
-    train_dataset = train_dataset.map(parse_image)
-    test_dataset = tf.data.Dataset.list_files(os.path.join(test_data, "*.jpg"), seed=SEED)
-    test_dataset =test_dataset.map(parse_image)
-
-
-    dataset = {"train": train_dataset, "test": test_dataset}
-
-    # シャッフルバッファのサイズをデータセットとおなじに設定することで、データが完全にシャッフルされる
-    BUFFER_SIZE = TRAINSET_SIZE
-
-    dataset['train'] = dataset['train'].map(load_image_train, num_parallel_calls=tf.data.experimental.AUTOTUNE)
-    dataset['train'] = dataset['train'].shuffle(buffer_size=BUFFER_SIZE, seed=SEED)
-    dataset['train'] = dataset['train'].repeat()
-    dataset['train'] = dataset['train'].batch(BATCH_SIZE)
-    dataset['train'] = dataset['train'].prefetch(buffer_size=AUTOTUNE)
-
-    dataset['test'] = dataset['test'].map(load_image_test)
-    dataset['test'] = dataset['test'].repeat()
-    dataset['test'] = dataset['test'].batch(BATCH_SIZE)
-    dataset['test'] = dataset['test'].prefetch(buffer_size=AUTOTUNE)
+    dataset = create_dataset(args.data_dir, IMG_SIZE, BATCH_SIZE)
 
     for image, mask in dataset['train'].take(1):
         sample_image, sample_mask = image, mask
@@ -185,6 +162,8 @@ if __name__ == '__main__':
     model = unet(input_size, num_classes=num_classes)
     model.compile(optimizer=Adam(learning_rate=0.0001), loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
                 metrics=['accuracy'])
+    model.summary()
+
     model.summary()
 
     for image, mask in dataset['train'].take(1):
@@ -220,7 +199,8 @@ if __name__ == '__main__':
         model_history = model.fit(dataset['train'], epochs=EPOCHS,
                                 steps_per_epoch=STEPS_PER_EPOCH,
                                 validation_steps=VALIDATION_STEPS,
-                                validation_data=dataset['test'])
+                                validation_data=dataset['test'],
+                                callbacks=[cp_callback])
 
     else:
         # On CPU
@@ -229,6 +209,13 @@ if __name__ == '__main__':
             model_history = model.fit(dataset['train'], epochs=EPOCHS,
                                     steps_per_epoch=STEPS_PER_EPOCH,
                                     validation_steps=VALIDATION_STEPS,
+<<<<<<< HEAD
                                     validation_data=dataset['test'])#,
                                     #callbacks=[cp_callback])
     
+=======
+                                    validation_data=dataset['test'],
+                                    callbacks=[cp_callback])
+
+    show_predictions()
+>>>>>>> ca2aff431bcfe322a2a5033b7620da1c5d39a251
