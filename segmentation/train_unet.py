@@ -116,7 +116,7 @@ def show_predictions(dataset=None, num=1):
 
 def display_sample(display_list):
 
-    plt.figure(figsize=(10, 10))
+    plt.figure(figsize=(10, 6))
 
     title = ['Input Image', 'True Mask', 'Predicted Mask']
 
@@ -134,7 +134,7 @@ if __name__ == '__main__':
     SEED = 30
     IMG_SIZE = 448
     N_CHANNELS = 3
-    BATCH_SIZE = 1
+    BATCH_SIZE = 4
     N_CLASSES = 4
 
     training_data = os.path.join(args.data_dir, 'train')
@@ -167,7 +167,7 @@ if __name__ == '__main__':
 
     show_predictions()
 
-    EPOCHS = 1
+    EPOCHS = 10
 
     STEPS_PER_EPOCH = TRAINSET_SIZE // BATCH_SIZE
     VALIDATION_STEPS = TESTSET_SIZE // BATCH_SIZE
