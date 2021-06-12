@@ -135,11 +135,7 @@ if __name__ == '__main__':
     # show_predictions()
 
 
-<<<<<<< HEAD
-    EPOCHS = 10
-=======
     EPOCHS = 20
->>>>>>> ff1c7c4894b94e816ad277b95ffc08a101b0f024
 
     STEPS_PER_EPOCH = TRAINSET_SIZE // BATCH_SIZE
     VALIDATION_STEPS = TESTSET_SIZE // BATCH_SIZE
