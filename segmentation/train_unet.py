@@ -11,7 +11,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import *
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
-
+from tensorflow_examples.models.pix2pix import pix2pix
 current_path = os.getcwd()
 sys.path.append(current_path) # /plant-record/ ディレクトリをパスに追加
 from segmentation.models.unet import unet
@@ -19,9 +19,9 @@ from segmentation.load_dataset import create_dataset
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Training Segmentation Model')
-    parser.add_argument('--data-dir', default='D:/Junya/Documents/plant_segmentation_data',
+    parser.add_argument('--data-dir', default='../',
                         help='dataset directory')
-    parser.add_argument('--result-dir', default='D:/Junya/Documents/plant-record-res',
+    parser.add_argument('--result-dir', default='../weights/',
                         help='result directory')
 
     parser.add_argument('--gpu', action='store_true',
@@ -75,25 +75,44 @@ def display_sample(display_list):
         plt.axis('off')
     plt.show()
 
+def display_result(loss, val_loss):
+    plt.figure()
+    plt.plot(model_history.epoch, loss, 'r', label='Training loss')
+    plt.plot(model_history.epoch, val_loss, 'bo', label='Validation loss')
+    plt.title('Training and Validation Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss Value')
+    plt.ylim([0, 1])
+    plt.legend()
+    plt.savefig('result.png')  
+    plt.show()
+
+
 if __name__ == '__main__':
 
     args = parse_args()
 
+    # TODO:configファイル
     SEED = 30
-    IMG_SIZE = 448
+    IMG_SIZE = 128
     N_CHANNELS = 3
-    BATCH_SIZE = 1
+    BATCH_SIZE = 2
     N_CLASSES = 4
 
     training_data = os.path.join(args.data_dir, 'train')
     test_data = os.path.join(args.data_dir, 'test')
     
     TRAINSET_SIZE = len(glob(os.path.join(training_data, "*.jpg")))
+    print(f"The Training Dataset contains {TRAINSET_SIZE} images.")
+    TESTSET_SIZE = len(glob(os.path.join(test_data, "*.jpg")))
+    print(f"The Test Dataset contains {TESTSET_SIZE} images.")
+
+    TRAINSET_SIZE = len(glob(os.path.join(training_data, "*.jpg")))
     TESTSET_SIZE = len(glob(os.path.join(test_data, "*.jpg")))
 
     dataset = create_dataset(args.data_dir, IMG_SIZE, BATCH_SIZE)
 
-    for image, mask in dataset['train'].take(1):
+    for image, mask in dataset['test'].take(1):
         sample_image, sample_mask = image, mask
 
     display_sample([sample_image[0], sample_mask[0]])
@@ -105,17 +124,18 @@ if __name__ == '__main__':
     num_classes = N_CLASSES
 
     model = unet(input_size, num_classes=num_classes)
-    model.compile(optimizer=Adam(learning_rate=0.0001), loss = tf.keras.losses.SparseCategoricalCrossentropy(),
-                metrics=['accuracy'])
+    # model = unet_model(OUTPUT_CHANNELS)
+    model.compile(optimizer=Adam(learning_rate=0.005),
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
 
-    model.summary()
-
-    for image, mask in dataset['train'].take(1):
+    for image, mask in dataset['test'].take(1):
         sample_image, sample_mask = image, mask
 
-    show_predictions()
+    # show_predictions()
 
-    EPOCHS = 1
+
+    EPOCHS = 20
 
     STEPS_PER_EPOCH = TRAINSET_SIZE // BATCH_SIZE
     VALIDATION_STEPS = TESTSET_SIZE // BATCH_SIZE
@@ -133,11 +153,10 @@ if __name__ == '__main__':
 
     checkpoint_path = os.path.join(save_dir, checkpoint_name)
 
-    # チェックポイントコールバックを作る
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, 
                                                     save_weights_only=True,
                                                     verbose=1)
-    
+
     if args.gpu:
         # On GPU
         model_history = model.fit(dataset['train'], epochs=EPOCHS,
@@ -148,11 +167,17 @@ if __name__ == '__main__':
 
     else:
         # On CPU
-        with tf.device("/cpu:0"):
+        with tf.device("/CPU:0"):
             model_history = model.fit(dataset['train'], epochs=EPOCHS,
                                     steps_per_epoch=STEPS_PER_EPOCH,
                                     validation_steps=VALIDATION_STEPS,
                                     validation_data=dataset['test'],
-                                    callbacks=[cp_callback])
+                                    callbacks=[cp_callback],
+                                    )
 
+    loss = model_history.history['loss']
+    val_loss = model_history.history['val_loss']
+    model.save(args.result_dir)
+
+    display_result(loss, val_loss)
     show_predictions()
