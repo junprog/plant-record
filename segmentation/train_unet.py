@@ -33,58 +33,6 @@ def parse_args():
     args = parser.parse_args()
     return args
 
-"""
-def parse_image(img_path: str) -> dict:
-    img = tf.io.read_file(img_path)
-    img = tf.image.decode_jpeg(img, channels=3)
-    img = tf.image.convert_image_dtype(img, tf.uint8)
-    
-    '''
-    regrex: 正規表現
-    Replace elements of input matching regex pattern with rewrite
-    tf.strings.regex_replace(input, pattern, rewrite, replace_global=True, name=None)
-    '''
-
-    mask_path = tf.strings.regex_replace(img_path, "jpg", "png")
-    # print("mask_path {}".format(mask_path))
-    mask = tf.io.read_file(mask_path)
-    mask = tf.image.decode_png(mask, channels=1)
-    mask = tf.where(mask == 255, np.dtype('uint8').type(0), mask)
-
-    return {'image': img, 'segmentation_mask': mask}
-
-
-@tf.function
-def normalize(input_image: tf.Tensor, input_mask: tf.Tensor) -> tuple:
-
-    input_image = tf.cast(input_image, tf.float32) / 255.0
-    return input_image, input_mask
-
-@tf.function
-def load_image_train(datapoint: dict) -> tuple:
-
-    input_image = tf.image.resize(datapoint['image'], (IMG_SIZE, IMG_SIZE))
-    input_mask = tf.image.resize(datapoint['segmentation_mask'], (IMG_SIZE, IMG_SIZE))
-
-    if tf.random.uniform(()) > 0.5:
-        input_image = tf.image.flip_left_right(input_image)
-        input_mask = tf.image.flip_left_right(input_mask)
-
-    input_image, input_mask = normalize(input_image, input_mask)
-
-    return input_image, input_mask
-
-@tf.function
-def load_image_test(datapoint: dict) -> tuple:
-
-    input_image = tf.image.resize(datapoint['image'], (IMG_SIZE, IMG_SIZE))
-    input_mask = tf.image.resize(datapoint['segmentation_mask'], (IMG_SIZE, IMG_SIZE))
-
-    input_image, input_mask = normalize(input_image, input_mask)
-
-    return input_image, input_mask
-"""
-
 def create_mask(pred_mask: tf.Tensor) -> tf.Tensor:
 
     pred_mask = tf.argmax(pred_mask, axis=-1)

@@ -5,7 +5,8 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
-## IMG_SIZE のスコープ問題
+from tensorflow.keras.backend import eval
+
 def create_dataset(data_path, img_size, batch_size, seed=30):
 
     training_data = os.path.join(data_path, 'train')
@@ -36,6 +37,9 @@ def create_dataset(data_path, img_size, batch_size, seed=30):
         # print("mask_path {}".format(mask_path))
         mask = tf.io.read_file(mask_path)
         mask = tf.image.decode_png(mask, channels=1)
+
+        print(np.unique(eval(mask)))
+
         mask = tf.where(mask == 255, np.dtype('uint8').type(0), mask)
         mask = tf.where(mask == 38, np.dtype('uint8').type(1), mask)
         mask = tf.where(mask == 75, np.dtype('uint8').type(2), mask)
