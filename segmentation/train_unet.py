@@ -177,7 +177,7 @@ if __name__ == '__main__':
 
     loss = model_history.history['loss']
     val_loss = model_history.history['val_loss']
-    model.save(args.result_dir)
+    model.save(save_dir)
 
     display_result(loss, val_loss)
     show_predictions()
