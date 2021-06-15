@@ -41,26 +41,26 @@ def display_sample(display_list):
 
 if __name__ == '__main__':
 
-    IMG_SIZE = 128
-    N_CHANNELS = 3
-    N_CLASSES = 4
+  IMG_SIZE = 448
+  N_CHANNELS = 3
+  N_CLASSES = 4
 
-    input_size = (IMG_SIZE, IMG_SIZE, N_CHANNELS)
-    num_classes = N_CLASSES
+  input_size = (IMG_SIZE, IMG_SIZE, N_CHANNELS)
+  num_classes = N_CLASSES
 
-    #test
-    img_path = 'PATH_TO_IMAGE'
-    weights_path = 'PATH_TO_YOUR_WEIGHT'
+  #test
+  img_path = 'D:\\Junya\\Documents\\plant-record-res\\E22U-IzVoAAQBbG.jpg'
+  weights_path = 'D:\\Junya\\Documents\\plant-record-res\\0613-160821-unet'
 
-    #input
-    img = tf.io.read_file(img_path)
-    img_tensor = preprocess_image(img)
-    img_tensor_reshape = tf.expand_dims(img_tensor, axis=0)
-    
-    # model = unet(input_size, num_classes=num_classes)
-    model = tf.keras.models.load_model(weights_path)
-    # model.compile(optimizer=Adam(learning_rate=0.0005), loss = tf.keras.losses.SparseCategoricalCrossentropy(),
-    #             metrics=['accuracy'])
-    pred_mask = model.predict(img_tensor_reshape)
+  #input
+  img = tf.io.read_file(img_path)
+  img_tensor = preprocess_image(img)
+  img_tensor_reshape = tf.expand_dims(img_tensor, axis=0)
+  
+  # model = unet(input_size, num_classes=num_classes)
+  model = tf.keras.models.load_model(weights_path)
+  # model.compile(optimizer=Adam(learning_rate=0.0005), loss = tf.keras.losses.SparseCategoricalCrossentropy(),
+  #             metrics=['accuracy'])
+  pred_mask = model.predict(img_tensor_reshape)
 
-    display_sample([img_tensor, create_mask(pred_mask)])
+  display_sample([img_tensor, create_mask(pred_mask)])

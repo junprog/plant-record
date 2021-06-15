@@ -8,6 +8,8 @@
     - opencv-python ()
     - PIL
     - tensorflow == 2.3.1
+    - tensorflow-examples
+        - command `pip install -q git+https://github.com/tensorflow/examples.git`
     - requests (api用)
     - requests-oauthlib (api用)
     - labelme (アノテーション用)

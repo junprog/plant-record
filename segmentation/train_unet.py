@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     # TODO:configファイル
     SEED = 30
-    IMG_SIZE = 128
+    IMG_SIZE = 448
     N_CHANNELS = 3
     BATCH_SIZE = 2
     N_CLASSES = 4
@@ -176,8 +176,8 @@ if __name__ == '__main__':
                                     )
 
     loss = model_history.history['loss']
-    val_loss = model_history.history['val_loss']
-    model.save(args.result_dir)
+    # val_loss = model_history.history['val_loss'] ## Key Error で'val_loss'が無いと怒られる
+    model.save(save_dir)
 
-    display_result(loss, val_loss)
+    # display_result(loss, val_loss)
     show_predictions()
