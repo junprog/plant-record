@@ -12,9 +12,9 @@ from matplotlib import pyplot as plt
 
 # 0は背景クラス
 CLASSES = {
-    'pot': 1,
+    'leaf': 1,
     'stem': 2,
-    'leaf': 3,
+    'pot': 3,
 }
 
 def parse_args():
@@ -26,19 +26,19 @@ def parse_args():
 
 def load_json(json_path):
     """
-        Args:
-            json_path: jsonファイルのパス
-        Return:
-            jsonを読み込んだインスタンス
+    Args:
+        json_path: jsonファイルのパス
+    Return:
+        jsonを読み込んだインスタンス
     """
     with open(json_path, "r",encoding="utf-8") as f:
         return json.load(f)
 
 def save_np2png(np_array, save_path):
     """
-        Args:
-            np_array: 2次元numpy配列
-            save_path: 保存するpngのパス+ファイル名
+    Args:
+        np_array: 2次元numpy配列
+        save_path: 保存するpngのパス+ファイル名
     """
     assert not os.path.exists(save_path), "指定したファイル名{}は存在します。".format(save_path)
 

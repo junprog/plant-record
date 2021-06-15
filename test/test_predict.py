@@ -7,8 +7,8 @@ import segmentation as seg
 
 if __name__ == '__main__':
     #test
-    img_path = 'C:\\Users\\jyuny\\Desktop\\addition\\pic_20210424_033612274_iOS.jpg'
-    weights_path = 'C:\\Users\\jyuny\\Downloads\\plant_segmentation_data\\0614-160014-unet'
+    img_path = 'C:/Users/Junya/Downloads/89hjqj6arfb/20210521_184321402_iOS.jpg'
+    weight_path = 'weights/0615-211605-unet'
 
-    out_path = seg.predict(img_path, weights_path)
-    print(out_path)
+    mask_path, viz_path = seg.predict(img_path, weight_path)
+    print(mask_path, viz_path)
