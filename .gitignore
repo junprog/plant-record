@@ -1,6 +1,5 @@
 # Option
 images/
-weights/
 .vscode/
 
 segmentation/train.txt
