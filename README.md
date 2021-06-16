@@ -63,7 +63,8 @@ $ python3 test/test_notify.py   # 通知テスト (撮影した画像パスを�
 $ python dataset/generate_mask.py [data directory] --labels dataset/labels.txt   
 ```
 
-実行後のディレクトリ構造:
+- 実行後の [data directory] ディレクトリ構造:
+
 ```
 [data directory]
     ├　class_names.txt
@@ -74,16 +75,14 @@ $ python dataset/generate_mask.py [data directory] --labels dataset/labels.txt
 ```
 
 - 学習: 
-
-学習コマンド
+    - 学習コマンド
 
 ```bash
-$ python3 segmentation/train_unet.py --data-dir [dataset directory] --result-dir [result-dir] --gpu
+$ python3 segmentation/train_unet.py --data-dir [data directory] --result-dir [result-dir] --gpu
 ```
 
-- 推論:
-
-推論コマンド
+- 予測:
+    - 予測コマンド
 
 ```bash
 $ python3 test/test_predict.py --image-path [image file path] --weight-path [weight file path]
@@ -92,11 +91,6 @@ $ python3 test/test_predict.py --image-path [image file path] --weight-path [wei
 | 入力画像 | 予測結果 |
 |---|---|
 | <img src="assets/20210521_184321402_iOS.jpg" width="700px"> | <img src="assets/20210521_184321402_iOS_viz.png" width="700px"> |
-
-
-
-
-
 
 
 <a id="recognizeDiff"></a>
