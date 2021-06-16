@@ -89,6 +89,16 @@ $ python3 segmentation/train_unet.py --data-dir [dataset directory] --result-dir
 $ python3 test/test_predict.py --image-path [image file path] --weight-path [weight file path]
 ```
 
+| 入力画像 | 予測結果 |
+|---|---|
+| <img src="assets/20210521_184321402_iOS.jpg" width="700px"> | <img src="assets/20210521_184321402_iOS_viz.png" width="700px"> |
+
+
+
+
+
+
+
 <a id="recognizeDiff"></a>
 
 ### recognizeDiff
