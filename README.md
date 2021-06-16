@@ -52,7 +52,43 @@ $ python3 test/test_notify.py   # 通知テスト (撮影した画像パスを�
 
 ### segmentation
 
-随時更新
+植物の写真 -> segmentation model -> segmentation mask [葉, 枝, 鉢, 背景] のセグメンテーションを行う。
+
+- データセット: 画像を各自で用意、各自でアノテーション
+
+ground truth 生成: generate_mask.py
+
+- ground truthのpngファイル作成
+
+```bash
+$ python dataset/generate_mask.py [data directory] --labels dataset/labels.txt   
+```
+
+実行後のディレクトリ構造:
+```
+[data directory]
+    ├　class_names.txt
+    ├　*.jpg
+    ├　*.png
+    └  SegmentationClassVisualization (optionで作成するかどうか指定可能)
+        └  *_vis.jpg
+```
+
+- 学習: 
+
+学習コマンド
+
+```bash
+$ python3 segmentation/train_unet.py --data-dir [dataset directory] --result-dir [result-dir] --gpu
+```
+
+- 推論:
+
+推論コマンド
+
+```bash
+$ python3 test/test_predict.py --image-path [image file path] --weight-path [weight file path]
+```
 
 <a id="recognizeDiff"></a>
 
