@@ -56,9 +56,8 @@ $ python3 test/test_notify.py   # 通知テスト (撮影した画像パスを�
 
 - データセット: 画像を各自で用意、各自でアノテーション
 
-ground truth 生成: generate_mask.py
-
-- ground truthのpngファイル作成
+- ground truth 生成: generate_mask.py
+	- ground truthのpngファイル作成
 
 ```bash
 $ python dataset/generate_mask.py [data directory] --labels dataset/labels.txt   
