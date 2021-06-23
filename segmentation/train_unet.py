@@ -20,9 +20,9 @@ from segmentation.load_dataset import create_dataset
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Training Segmentation Model')
-    parser.add_argument('--data-dir', default='C:/Users/Yoshimoto/Downloads/plant_segmentation_data',
+    parser.add_argument('--data-dir', default='C:/Users/Yoshimoto/Downloads/plant_segmentation_data/plant_segmentation_data',
                         help='dataset directory')
-    parser.add_argument('--result-dir', default='C:/Users/Yoshimoto/Documents/plant-record-res',
+    parser.add_argument('--result-dir', default='D:/OneDrive - 学校法人立命館/plant-record',
                         help='result directory')
 
     parser.add_argument('--gpu', action='store_true',
@@ -170,7 +170,7 @@ if __name__ == '__main__':
         sample_image, sample_mask = image, mask
 
 #    show_predictions()
-    EPOCHS = 1
+    EPOCHS = 300
 
 
     STEPS_PER_EPOCH = TRAINSET_SIZE // BATCH_SIZE
@@ -209,13 +209,7 @@ if __name__ == '__main__':
             model_history = model.fit(dataset['train'], epochs=EPOCHS,
                                     steps_per_epoch=STEPS_PER_EPOCH,
                                     validation_steps=VALIDATION_STEPS,
-<<<<<<< HEAD
-                                    validation_data=dataset['test'])#,
-                                    #callbacks=[cp_callback])
-    
-=======
                                     validation_data=dataset['test'],
                                     callbacks=[cp_callback])
 
     show_predictions()
->>>>>>> ca2aff431bcfe322a2a5033b7620da1c5d39a251

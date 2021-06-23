@@ -43,23 +43,6 @@ def create_dataset(data_path, img_size, batch_size, seed=30):
 
         return {'image': img, 'segmentation_mask': mask}
 
-<<<<<<< HEAD
- @tf.function
-def load_image_train(datapoint: dict) -> tuple:
-    input_image = tf.image.resize(datapoint['image'], (IMG_SIZE, IMG_SIZE), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-    input_mask = tf.image.resize(datapoint['segmentation_mask'], (IMG_SIZE, IMG_SIZE), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-    if tf.random.uniform(()) > 0.5:
-        input_image = tf.image.flip_left_right(input_image)
-        input_mask = tf.image.flip_left_right(input_mask)
-    input_image, input_mask = normalize(input_image, input_mask)
-    return input_image, input_mask
-@tf.function
-def load_image_test(datapoint: dict) -> tuple:
-    input_image = tf.image.resize(datapoint['image'], (IMG_SIZE, IMG_SIZE), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-    input_mask = tf.image.resize(datapoint['segmentation_mask'], (IMG_SIZE, IMG_SIZE), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
-    input_image, input_mask = normalize(input_image, input_mask)
-    return input_image, input_mask
-=======
 
     @tf.function
     def normalize(input_image: tf.Tensor, input_mask: tf.Tensor) -> tuple:
@@ -72,7 +55,6 @@ def load_image_test(datapoint: dict) -> tuple:
 
         input_image = tf.image.resize(datapoint['image'], (IMG_SIZE, IMG_SIZE), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
         input_mask = tf.image.resize(datapoint['segmentation_mask'], (IMG_SIZE, IMG_SIZE), method=tf.image.ResizeMethod.NEAREST_NEIGHBOR)
->>>>>>> ca2aff431bcfe322a2a5033b7620da1c5d39a251
 
         if tf.random.uniform(()) > 0.5:
             input_image = tf.image.flip_left_right(input_image)
