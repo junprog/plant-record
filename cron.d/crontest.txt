@@ -1,1 +1,2 @@
-*/1 * * * * cd /home/junya/Documents/plant-record; /usr/bin/python3 /home/junya/Documents/plant-record/main_flow.py
+#*/1 * * * * cd /app; /usr/bin/python3 /app/plant-record/main_flow.py
+* * * * * cd /app; touch test.txt
