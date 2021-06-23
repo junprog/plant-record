@@ -1,5 +1,6 @@
 # Option
 images/
+weights/
 .vscode/
 tfv2.tar
 

@@ -19,9 +19,9 @@ from segmentation.load_dataset import create_dataset
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Training Segmentation Model')
-    parser.add_argument('--data-dir', default='../',
+    parser.add_argument('--data-dir', default='',
                         help='dataset directory')
-    parser.add_argument('--result-dir', default='../weights/',
+    parser.add_argument('--result-dir', default='weights/',
                         help='result directory')
 
     parser.add_argument('--gpu', action='store_true',
@@ -64,7 +64,7 @@ def show_predictions(dataset=None, num=1):
 
 def display_sample(display_list):
 
-    plt.figure(figsize=(10, 10))
+    plt.figure(figsize=(10, 6))
 
     title = ['Input Image', 'True Mask', 'Predicted Mask']
 
@@ -75,7 +75,7 @@ def display_sample(display_list):
         plt.axis('off')
     plt.show()
 
-def display_result(loss, val_loss):
+def display_result(loss, val_loss, save_dir):
     plt.figure()
     plt.plot(model_history.epoch, loss, 'r', label='Training loss')
     plt.plot(model_history.epoch, val_loss, 'bo', label='Validation loss')
@@ -84,7 +84,7 @@ def display_result(loss, val_loss):
     plt.ylabel('Loss Value')
     plt.ylim([0, 1])
     plt.legend()
-    plt.savefig('result.png')  
+    plt.savefig(os.path.join(save_dir, 'result.png'))  
     plt.show()
 
 
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     # TODO:configファイル
     SEED = 30
-    IMG_SIZE = 128
+    IMG_SIZE = 512
     N_CHANNELS = 3
     BATCH_SIZE = 2
     N_CLASSES = 4
@@ -128,12 +128,6 @@ if __name__ == '__main__':
     model.compile(optimizer=Adam(learning_rate=0.005),
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
-
-    for image, mask in dataset['test'].take(1):
-        sample_image, sample_mask = image, mask
-
-    # show_predictions()
-
 
     EPOCHS = 20
 
@@ -179,5 +173,5 @@ if __name__ == '__main__':
     val_loss = model_history.history['val_loss']
     model.save(save_dir)
 
-    display_result(loss, val_loss)
+    display_result(loss, val_loss, save_dir)
     show_predictions()

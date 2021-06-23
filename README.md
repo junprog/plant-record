@@ -8,7 +8,8 @@
     - opencv-python ()
     - PIL
     - tensorflow == 2.3.1
-    - tensorflow-examples `pip install -q git+https://github.com/tensorflow/examples.git`で入れる
+    - tensorflow-examples
+        - command `pip install -q git+https://github.com/tensorflow/examples.git`
     - requests (api用)
     - requests-oauthlib (api用)
     - labelme (アノテーション用)
@@ -51,7 +52,46 @@ $ python3 test/test_notify.py   # 通知テスト (撮影した画像パスを�
 
 ### segmentation
 
-随時更新
+植物の写真 -> segmentation model -> segmentation mask [葉, 枝, 鉢, 背景] のセグメンテーションを行う。
+
+- データセット: 画像を各自で用意、各自でアノテーション
+
+- ground truth 生成: generate_mask.py
+	- ground truthのpngファイル作成
+
+```bash
+$ python dataset/generate_mask.py [data directory] --labels dataset/labels.txt   
+```
+
+- 実行後の [data directory] ディレクトリ構造:
+
+```
+[data directory]
+    ├　class_names.txt
+    ├　*.jpg
+    ├　*.png
+    └  SegmentationClassVisualization (optionで作成するかどうか指定可能)
+        └  *_vis.jpg
+```
+
+- 学習: 
+    - 学習コマンド
+
+```bash
+$ python3 segmentation/train_unet.py --data-dir [data directory] --result-dir [result-dir] --gpu
+```
+
+- 予測:
+    - 予測コマンド
+
+```bash
+$ python3 test/test_predict.py --image-path [image file path] --weight-path [weight file path]
+```
+
+| 入力画像 | 予測結果 |
+|---|---|
+| <img src="assets/20210521_184321402_iOS.jpg" width="700px"> | <img src="assets/20210521_184321402_iOS_viz.png" width="700px"> |
+
 
 <a id="recognizeDiff"></a>
 
