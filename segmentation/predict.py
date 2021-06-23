@@ -55,13 +55,13 @@ def preprocess_image(image):
 	return image
 
 def create_mask(pred_mask: tf.Tensor) -> tf.Tensor:
-		pred_mask = tf.argmax(pred_mask, axis=-1)
-		pred_mask = tf.squeeze(pred_mask, axis=0)
-		# pred_mask becomes [IMG_SIZE, IMG_SIZE]
-		# but matplotlib needs [IMG_SIZE, IMG_SIZE, 1]
-		pred_mask = tf.expand_dims(pred_mask, axis=-1)
+	pred_mask = tf.argmax(pred_mask, axis=-1)
+	pred_mask = tf.squeeze(pred_mask, axis=0)
+	# pred_mask becomes [IMG_SIZE, IMG_SIZE]
+	# but matplotlib needs [IMG_SIZE, IMG_SIZE, 1]
+	pred_mask = tf.expand_dims(pred_mask, axis=-1)
 
-		return pred_mask
+	return pred_mask
 
 def mask_tf2np(mask):
 	mask = create_mask(mask)
