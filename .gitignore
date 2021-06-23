@@ -1,6 +1,7 @@
 # Option
 images/
 .vscode/
+tfv2.tar
 
 segmentation/train.txt
 segmentation/val.txt
