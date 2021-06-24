@@ -48,8 +48,9 @@
 - 通知      : Twitter, Slack + incoming-webhook
 
 ```bash
-$ sh setup_notify_twitter.sh # config 作成 → twitter, slackのconfigを各自入力
-$ python3 notify_test.py
+$ sh setup_notify_twitter.sh    # config 作成 → twitter, slackのconfigを各自入力
+$ python3 test/test_getimage.py # 写真撮影テスト
+$ python3 test/test_notify.py   # 通知テスト (撮影した画像パスを入力)
 ```
 
 <a id="segmentation"></a>
