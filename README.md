@@ -33,7 +33,7 @@ $ git checkout -b develop origin/develop
 ```bash
 $ sudo docker build -t plant-record .
 ... # 時間かかります
-$ sudo docker run -it --rm --runtime nvidia --device /dev/video1:/dev/video1:mwr plant-record 
+$ sudo docker run -it --rm --runtime nvidia --network host --device /dev/video1:/dev/video1:mwr plant-record 
 ```
 
 - コンテナ内にてテスト
