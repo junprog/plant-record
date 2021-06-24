@@ -25,3 +25,4 @@ RUN export LD_PRELOAD=/usr/lib/aarch64-linux-gnu/libgomp.so.1
 ### その他 パッケージ インストール
 RUN pip3 install -q git+https://github.com/tensorflow/examples.git
 RUN pip3 install -r requirements.txt
+RUN pip3 install Pillow==5.3.0
