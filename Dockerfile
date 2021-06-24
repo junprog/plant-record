@@ -15,7 +15,7 @@ RUN apt-get install -y cron \
                      git
 
 ### Pillow用のフォント
-RUN apt-get install libfreetype6 \
+RUN apt-get install -y libfreetype6 \
                      libfreetype6-dev \
                      libxft-dev \
                      libjpeg62 \
