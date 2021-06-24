@@ -1,6 +1,11 @@
 # Option
 images/
 weights/
+.vscode/
+tfv2.tar
+
+segmentation/train.txt
+segmentation/val.txt
 
 # Ignore twitter api token
 notify/twitter/twitter_api_config.py

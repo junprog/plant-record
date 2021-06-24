@@ -16,7 +16,7 @@ def captureImage():
     #cap = cv2.VideoCapture(GST_STR, cv2.CAP_GSTREAMER)
 
     # USB Camera
-    cap = cv2.VideoCapture(1, cv2.CAP_V4L)
+    cap = cv2.VideoCapture(0, cv2.CAP_V4L)
 
     ret, img = cap.read()
 
