@@ -12,7 +12,14 @@ COPY . /app
 RUN apt-get -y update
 RUN apt-get install -y cron \
                      vim \
-                     git 
+                     git
+
+### Pillow用のフォント
+RUN apt-get install libfreetype6 \
+                     libfreetype6-dev \
+                     libxft-dev \
+                     libjpeg62 \
+                     libjpeg-dev
 
 ### pip3 で入らなかったパッケージを apt-get でインストール
 RUN apt-get install -y python3-opencv \
