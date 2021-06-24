@@ -6,7 +6,7 @@ import segmentation as seg
 img_path = getimg.captureImage()
 
 ## セグメンテーション
-weight_path = 'weights/0615-211605-unet'
+weight_path = 'weights/0615-225649-unet'
 _, viz_path = seg.predict(img_path, weight_path)
 
 ## twitter 投稿
