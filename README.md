@@ -24,6 +24,7 @@
 - リポジトリをクローン, developブランチに切り替え
 ```bash
 $ git clone git@github.com:junprog/plant-record.git
+$ cd plant-record
 $ git featch
 $ git checkout -b develop origin/develop
 ```
