@@ -1,5 +1,6 @@
 # Option
 images/
+weights/
 
 # Ignore twitter api token
 notify/twitter/twitter_api_config.py

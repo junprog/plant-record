@@ -2,14 +2,25 @@
 植物の成長記録を全自動で行おう。成長差分の認識もしたいな。成長の統計の可視化もしたいな。目指せ publish
 
 ## Environment
-
 - jetson nano (Ubuntu 16.04 LTS)
 - python 3.6
     - opencv-python
-    - (pytorch)
+    - PIL
+    - tensorflow == 2.3.1
+    - tensorflow-examples
+        - command `pip install -q git+https://github.com/tensorflow/examples.git`
     - requests (api用)
     - requests-oauthlib (api用)
+    - labelme (アノテーション用)
+        - `pip install labelme` で`pyqt`が入らなったら`conda install pyqt`で入れる 
+
 - USB Web Camera (RasberryPi Camera Moduleは画質、色彩が悪かった)
+
+
+### Docker [jetson tensorflow image](https://ngc.nvidia.com/catalog/containers/nvidia:l4t-tensorflow) (Ubuntu 18.04.5 LTS)
+- cron
+- Python 3.6.9
+    tensorflow == 2.3.1 (l4t-tensorflow:r32.5.0-tf2.3-py3)
 
 ## Features
 
