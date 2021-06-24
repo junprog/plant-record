@@ -28,7 +28,7 @@ def tweetInfo(image_files=None):
         url = "https://api.twitter.com/1.1/statuses/update.json"
         url_media = "https://upload.twitter.com/1.1/media/upload.json"
 
-        media_id = []
+        media_ids = ""
         for image_filepath in image_files:
             ## ツイート画像 ##
             files = {"media" : open(image_filepath, 'rb')}
@@ -39,8 +39,15 @@ def tweetInfo(image_files=None):
                 exit()
 
             # Media ID を取得
-            media_id.append(json.loads(req_media.text)['media_id'])
+            media_id = json.loads(req_media.text)['media_id']
+            media_id_string = json.loads(req_media.text)['media_id_string']
+
             print ("Media ID: %d" % media_id)
+
+            if media_ids == "":
+                media_ids += media_id_string
+            else:
+                media_ids = media_ids + "," + media_id_string
 
         ## ツイート文章 ##
         date_info = dict()
@@ -58,7 +65,7 @@ def tweetInfo(image_files=None):
             date_info["hour"],
             date_info["minute"])
 
-        params = {"status" : tweet, "media_ids" : media_id}
+        params = {"status" : tweet, "media_ids" : [media_ids]}
 
         res = twitter.post(url, params=params) #post送信
 
