@@ -25,7 +25,7 @@
 ```bash
 $ git clone git@github.com:junprog/plant-record.git
 $ cd plant-record
-$ git featch
+$ git fetch
 $ git checkout -b develop origin/develop
 ```
 
