@@ -13,7 +13,7 @@ sys.path.append(current_path) # /plant-record/ ディレクトリをパスに追
 
 from segmentation.models.unet import unet
 
-MIN_SIZE = 512
+MIN_SIZE = 384
 
 def search_input_shape(image):
 	"""
