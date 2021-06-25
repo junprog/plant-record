@@ -1,6 +1,10 @@
 # plant-record
 植物の成長記録を全自動で行おう。成長差分の認識もしたいな。成長の統計の可視化もしたいな。目指せ publish
 
+2021/06/25 時点
+
+![system overview](assets/system.svg)
+
 ## Environment
 
 ### jetson nano
