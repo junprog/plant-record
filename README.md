@@ -3,7 +3,7 @@
 
 2021/06/25 時点
 
-![system overview](assets/system.png)
+![system overview](assets/system.svg)
 
 ## Environment
 
