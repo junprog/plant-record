@@ -16,8 +16,7 @@ from segmentation.models.unet import unet
 MIN_SIZE = 384
 
 def search_input_shape(image):
-	"""
-	UNet の入力サイズの探索を行う。
+	"""UNet の入力サイズの探索を行う。
 	e.g.) 	1st Step:
 				2031 x 4067 -> MIN_SIZE x MIN_SIZE*round(4067 / 2031) = 512 x 1024
 		  	2nd Step:
@@ -75,8 +74,7 @@ def mask_tf2np(mask):
 	return mask
 
 def create_classnames(label_path='dataset/labels.txt'):
-	"""
-	imgviz.io.imsave で必要な可視化画像を作成するためクラス名を取得し tuple で返す
+	"""imgviz.io.imsave で必要な可視化画像を作成するためクラス名を取得し tuple で返す
 
 	Args:
 		label_path	--- dataset/generate_mask.py で使用した labels.txt の保存ファイル名
@@ -101,8 +99,7 @@ def create_classnames(label_path='dataset/labels.txt'):
 	return class_names
 
 def create_save_vizmask(image, mask, output_mask_path, output_viz_path):
-	"""
-	カラーリングされたセグメンテーションマスク: {}_mask.png の作成, 保存
+	"""カラーリングされたセグメンテーションマスク: {}_mask.png の作成, 保存
 	入力画像とセグメンテーションマスクをブレンダリングした可視化画像: {}_viz.png の作成, 保存
 
 	Args: 
