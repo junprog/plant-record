@@ -20,9 +20,9 @@ from segmentation.load_dataset import create_dataset
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Training Segmentation Model')
-    parser.add_argument('--data-dir', default='C:/Users/Yoshimoto/Downloads/plant_segmentation_data/plant_segmentation_data',
+    parser.add_argument('--data-dir', default='C:/Users/is0383ip/Downloads/plant_segmentation_data/plant_segmentation_data',
                         help='dataset directory')
-    parser.add_argument('--result-dir', default='D:/OneDrive - 学校法人立命館/plant-record',
+    parser.add_argument('--result-dir', default='C:/Users/is0383ip/OneDrive - 学校法人立命館/plant-record',
                         help='result directory')
 
     parser.add_argument('--gpu', action='store_true',
@@ -177,7 +177,8 @@ if __name__ == '__main__':
     VALIDATION_STEPS = TESTSET_SIZE // BATCH_SIZE
 
     checkpoint_name = "cp.ckpt"
-    
+    checkpoint_name = "model_{epoch:06d}.h5"
+    checkpoint_name = "saved_model"
     ### 結果出力ディレクトリ作成 ###
     if not os.path.isdir(args.result_dir):
         os.mkdir(args.result_dir)
