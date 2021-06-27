@@ -1,74 +1,57 @@
 import tensorflow as tf
 from tensorflow.keras.layers import *
+from tensorflow_examples.models.pix2pix import pix2pix
 
 '''
-モデルは別ファイルで定義したい
+Tensorflowのチュートリアルより
+https://www.tensorflow.org/tutorials/images/segmentation?hl=ja
 '''
 
 def unet(input_shape, num_classes=4):
-    # -- Keras Functional API -- #
-    # -- UNet Implementation -- #
-    input_size = input_shape
 
-    initializer = 'he_normal'
+    base_model = tf.keras.applications.MobileNetV2(input_shape, include_top=False)
 
-    # -- Encoder -- #
-    # Block encoder 1
-    inputs = Input(shape=input_size)
-    conv_enc_1 = Conv2D(64, 3, activation='relu', padding='same', kernel_initializer=initializer)(inputs)
-    conv_enc_1 = Conv2D(64, 3, activation = 'relu', padding='same', kernel_initializer=initializer)(conv_enc_1)
+    # Use the activations of these layers
+    layer_names = [
+        'block_1_expand_relu',   # 64x64
+        'block_3_expand_relu',   # 32x32
+        'block_6_expand_relu',   # 16x16
+        'block_13_expand_relu',  # 8x8
+        'block_16_project',      # 4x4
+    ]
+    base_model_outputs = [base_model.get_layer(name).output for name in layer_names]
 
-    # Block encoder 2
-    max_pool_enc_2 = MaxPooling2D(pool_size=(2, 2))(conv_enc_1)
-    conv_enc_2 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(max_pool_enc_2)
-    conv_enc_2 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_enc_2)
+    # Create the feature extraction model
+    down_stack = tf.keras.Model(inputs=base_model.input, outputs=base_model_outputs)
 
-    # Block  encoder 3
-    max_pool_enc_3 = MaxPooling2D(pool_size=(2, 2))(conv_enc_2)
-    conv_enc_3 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(max_pool_enc_3)
-    conv_enc_3 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_enc_3)
+    down_stack.trainable = False
 
-    # Block  encoder 4
-    max_pool_enc_4 = MaxPooling2D(pool_size=(2, 2))(conv_enc_3)
-    conv_enc_4 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(max_pool_enc_4)
-    conv_enc_4 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_enc_4)
-    # -- Encoder -- #
+    up_stack = [
+    pix2pix.upsample(512, 3),  # 4x4 -> 8x8
+    pix2pix.upsample(256, 3),  # 8x8 -> 16x16
+    pix2pix.upsample(128, 3),  # 16x16 -> 32x32
+    pix2pix.upsample(64, 3),   # 32x32 -> 64x64
+    ]
 
-    # ----------- #
-    maxpool = MaxPooling2D(pool_size=(2, 2))(conv_enc_4)
-    conv = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(maxpool)
-    conv = Conv2D(1024, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv)
-    # ----------- #
+    #define model
+    inputs = tf.keras.layers.Input(shape=input_shape)
 
-    # -- Decoder -- #
-    # Block decoder 1
-    up_dec_1 = Conv2D(512, 2, activation = 'relu', padding = 'same', kernel_initializer = initializer)(UpSampling2D(size = (2,2))(conv))
-    merge_dec_1 = concatenate([conv_enc_4, up_dec_1], axis = 3)
-    conv_dec_1 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(merge_dec_1)
-    conv_dec_1 = Conv2D(512, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_1)
+    # Downsampling through the model
+    skips = down_stack(inputs)
+    x = skips[-1]
+    skips = reversed(skips[:-1])
 
-    # Block decoder 2
-    up_dec_2 = Conv2D(256, 2, activation = 'relu', padding = 'same', kernel_initializer = initializer)(UpSampling2D(size = (2,2))(conv_dec_1))
-    merge_dec_2 = concatenate([conv_enc_3, up_dec_2], axis = 3)
-    conv_dec_2 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(merge_dec_2)
-    conv_dec_2 = Conv2D(256, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_2)
+    # Upsampling and establishing the skip connections
+    for up, skip in zip(up_stack, skips):
+        x = up(x)
+        concat = tf.keras.layers.Concatenate()
+        x = concat([x, skip])
 
-    # Block decoder 3
-    up_dec_3 = Conv2D(128, 2, activation = 'relu', padding = 'same', kernel_initializer = initializer)(UpSampling2D(size = (2,2))(conv_dec_2))
-    merge_dec_3 = concatenate([conv_enc_2, up_dec_3], axis = 3)
-    conv_dec_3 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(merge_dec_3)
-    conv_dec_3 = Conv2D(128, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_3)
+    # This is the last layer of the model
+    last = tf.keras.layers.Conv2DTranspose(
+        num_classes, 3, strides=2,
+        padding='same')  #64x64 -> 128x128
 
-    # Block decoder 4
-    up_dec_4 = Conv2D(64, 2, activation = 'relu', padding = 'same', kernel_initializer = initializer)(UpSampling2D(size = (2,2))(conv_dec_3))
-    merge_dec_4 = concatenate([conv_enc_1, up_dec_4], axis = 3)
-    conv_dec_4 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(merge_dec_4)
-    conv_dec_4 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_4)
-    conv_dec_4 = Conv2D(64, 3, activation = 'relu', padding = 'same', kernel_initializer = initializer)(conv_dec_4)
-    # -- Dencoder -- #
+    x = last(x)
 
-#    output = Conv2D(num_classes, 1, activation = 'softmax')(conv_dec_4)
-    output = Conv2D(num_classes, 1)(conv_dec_4)
-    outputs = tf.keras.layers.Softmax(axis=2)(output)
-
-    return tf.keras.Model(inputs = inputs, outputs = outputs)
+    return tf.keras.Model(inputs=inputs, outputs=x)

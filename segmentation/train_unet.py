@@ -12,7 +12,7 @@ import tensorflow as tf
 from tensorflow.keras.layers import *
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
 from tensorflow.keras.optimizers import Adam
-
+from tensorflow_examples.models.pix2pix import pix2pix
 current_path = os.getcwd()
 sys.path.append(current_path) # /plant-record/ ディレクトリをパスに追加
 from segmentation.models.unet import unet
@@ -20,9 +20,9 @@ from segmentation.load_dataset import create_dataset
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Training Segmentation Model')
-    parser.add_argument('--data-dir', default='C:/Users/is0383ip/Downloads/plant_segmentation_data/plant_segmentation_data',
+    parser.add_argument('--data-dir', default='',
                         help='dataset directory')
-    parser.add_argument('--result-dir', default='C:/Users/is0383ip/OneDrive - 学校法人立命館/plant-record',
+    parser.add_argument('--result-dir', default='weights/',
                         help='result directory')
 
     parser.add_argument('--gpu', action='store_true',
@@ -33,58 +33,6 @@ def parse_args():
 
     args = parser.parse_args()
     return args
-
-"""
-def parse_image(img_path: str) -> dict:
-    img = tf.io.read_file(img_path)
-    img = tf.image.decode_jpeg(img, channels=3)
-    img = tf.image.convert_image_dtype(img, tf.uint8)
-    
-    '''
-    regrex: 正規表現
-    Replace elements of input matching regex pattern with rewrite
-    tf.strings.regex_replace(input, pattern, rewrite, replace_global=True, name=None)
-    '''
-
-    mask_path = tf.strings.regex_replace(img_path, "jpg", "png")
-    # print("mask_path {}".format(mask_path))
-    mask = tf.io.read_file(mask_path)
-    mask = tf.image.decode_png(mask, channels=1)
-    mask = tf.where(mask == 255, np.dtype('uint8').type(0), mask)
-
-    return {'image': img, 'segmentation_mask': mask}
-
-
-@tf.function
-def normalize(input_image: tf.Tensor, input_mask: tf.Tensor) -> tuple:
-
-    input_image = tf.cast(input_image, tf.float32) / 255.0
-    return input_image, input_mask
-
-@tf.function
-def load_image_train(datapoint: dict) -> tuple:
-
-    input_image = tf.image.resize(datapoint['image'], (IMG_SIZE, IMG_SIZE))
-    input_mask = tf.image.resize(datapoint['segmentation_mask'], (IMG_SIZE, IMG_SIZE))
-
-    if tf.random.uniform(()) > 0.5:
-        input_image = tf.image.flip_left_right(input_image)
-        input_mask = tf.image.flip_left_right(input_mask)
-
-    input_image, input_mask = normalize(input_image, input_mask)
-
-    return input_image, input_mask
-
-@tf.function
-def load_image_test(datapoint: dict) -> tuple:
-
-    input_image = tf.image.resize(datapoint['image'], (IMG_SIZE, IMG_SIZE))
-    input_mask = tf.image.resize(datapoint['segmentation_mask'], (IMG_SIZE, IMG_SIZE))
-
-    input_image, input_mask = normalize(input_image, input_mask)
-
-    return input_image, input_mask
-"""
 
 def create_mask(pred_mask: tf.Tensor) -> tf.Tensor:
 
@@ -119,7 +67,7 @@ def show_predictions(dataset=None, num=1):
 
 def display_sample(display_list):
 
-    plt.figure(figsize=(10, 10))
+    plt.figure(figsize=(10, 6))
 
     title = ['Input Image', 'True Mask', 'Predicted Mask']
 
@@ -130,25 +78,44 @@ def display_sample(display_list):
         plt.axis('off')
     plt.show()
 
+def display_result(loss, val_loss, save_dir):
+    plt.figure()
+    plt.plot(model_history.epoch, loss, 'r', label='Training loss')
+    plt.plot(model_history.epoch, val_loss, 'bo', label='Validation loss')
+    plt.title('Training and Validation Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Loss Value')
+    plt.ylim([0, 1])
+    plt.legend()
+    plt.savefig(os.path.join(save_dir, 'result.png'))  
+    plt.show()
+
+
 if __name__ == '__main__':
 
     args = parse_args()
 
+    # TODO:configファイル
     SEED = 30
-    IMG_SIZE = 448
+    IMG_SIZE = 512
     N_CHANNELS = 3
-    BATCH_SIZE = 1
+    BATCH_SIZE = 2
     N_CLASSES = 4
 
     training_data = os.path.join(args.data_dir, 'train')
     test_data = os.path.join(args.data_dir, 'test')
     
     TRAINSET_SIZE = len(glob(os.path.join(training_data, "*.jpg")))
+    print(f"The Training Dataset contains {TRAINSET_SIZE} images.")
+    TESTSET_SIZE = len(glob(os.path.join(test_data, "*.jpg")))
+    print(f"The Test Dataset contains {TESTSET_SIZE} images.")
+
+    TRAINSET_SIZE = len(glob(os.path.join(training_data, "*.jpg")))
     TESTSET_SIZE = len(glob(os.path.join(test_data, "*.jpg")))
 
     dataset = create_dataset(args.data_dir, IMG_SIZE, BATCH_SIZE)
 
-    for image, mask in dataset['train'].take(1):
+    for image, mask in dataset['test'].take(1):
         sample_image, sample_mask = image, mask
 
 #    display_sample([sample_image[0], sample_mask[0]])
@@ -160,18 +127,13 @@ if __name__ == '__main__':
     num_classes = N_CLASSES
 
     model = unet(input_size, num_classes=num_classes)
-    model.compile(optimizer=Adam(learning_rate=0.0001), loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=False),
-                metrics=['accuracy'])
-    model.summary()
 
-    model.summary()
+    # model = unet_model(OUTPUT_CHANNELS)
+    model.compile(optimizer=Adam(learning_rate=0.005),
+              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+              metrics=['accuracy'])
 
-    for image, mask in dataset['train'].take(1):
-        sample_image, sample_mask = image, mask
-
-#    show_predictions()
-    EPOCHS = 300
-
+    EPOCHS = 20
 
     STEPS_PER_EPOCH = TRAINSET_SIZE // BATCH_SIZE
     VALIDATION_STEPS = TESTSET_SIZE // BATCH_SIZE
@@ -190,11 +152,10 @@ if __name__ == '__main__':
 
     checkpoint_path = os.path.join(save_dir, checkpoint_name)
 
-    # チェックポイントコールバックを作る
     cp_callback = tf.keras.callbacks.ModelCheckpoint(checkpoint_path, 
                                                     save_weights_only=True,
                                                     verbose=1)
-    
+
     if args.gpu:
         # On GPU
         model_history = model.fit(dataset['train'], epochs=EPOCHS,
@@ -205,12 +166,17 @@ if __name__ == '__main__':
 
     else:
         # On CPU
-        with tf.device("/cpu:0"):
-            print("CPU\n\n\n")
+        with tf.device("/CPU:0"):
             model_history = model.fit(dataset['train'], epochs=EPOCHS,
                                     steps_per_epoch=STEPS_PER_EPOCH,
                                     validation_steps=VALIDATION_STEPS,
                                     validation_data=dataset['test'],
-                                    callbacks=[cp_callback])
+                                    callbacks=[cp_callback],
+                                    )
 
+    loss = model_history.history['loss']
+    val_loss = model_history.history['val_loss']
+    model.save(save_dir)
+
+    display_result(loss, val_loss, save_dir)
     show_predictions()
