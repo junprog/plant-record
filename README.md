@@ -133,9 +133,9 @@ $ python3 test/test_predict.py --image-path [image file path] --weight-path [wei
 <a id="GUI"></a>
 
 ### GUI
-'''
+```
 $ python gui_test.py  
-'''
+```
 基本的な操作はウインドウ上のボタンで行う    
 
 中身について  
