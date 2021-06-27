@@ -1,4 +1,5 @@
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import sys
 import argparse
 from datetime import datetime
@@ -60,7 +61,9 @@ def show_predictions(dataset=None, num=1):
         pred_mask = create_mask(inference)
         # pred_mask -> [1, IMG_SIZE, IMG_SIZE, 1]
         display_sample([sample_image[0], sample_mask[0],
-                        pred_mask[0]])
+                        pred_mask[0
+                        ]])
+
 
 def display_sample(display_list):
 
@@ -115,7 +118,7 @@ if __name__ == '__main__':
     for image, mask in dataset['test'].take(1):
         sample_image, sample_mask = image, mask
 
-    display_sample([sample_image[0], sample_mask[0]])
+#    display_sample([sample_image[0], sample_mask[0]])
 
     # -- Keras Functional API -- #
     # -- UNet Implementation -- #
@@ -124,6 +127,7 @@ if __name__ == '__main__':
     num_classes = N_CLASSES
 
     model = unet(input_size, num_classes=num_classes)
+
     # model = unet_model(OUTPUT_CHANNELS)
     model.compile(optimizer=Adam(learning_rate=0.005),
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -135,7 +139,8 @@ if __name__ == '__main__':
     VALIDATION_STEPS = TESTSET_SIZE // BATCH_SIZE
 
     checkpoint_name = "cp.ckpt"
-    
+    checkpoint_name = "model_{epoch:06d}.h5"
+    checkpoint_name = "saved_model"
     ### 結果出力ディレクトリ作成 ###
     if not os.path.isdir(args.result_dir):
         os.mkdir(args.result_dir)
