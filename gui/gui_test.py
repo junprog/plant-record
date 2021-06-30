@@ -2,7 +2,8 @@
 import sys
 import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-import tensorflow as tf
+import csv
+#import tensorflow as tf
 from PyQt5.QtWidgets import QWidget, QHBoxLayout, QLCDNumber, QLabel, QApplication
 from PyQt5.QtGui import QPixmap, QFont
 from PyQt5.QtCore import QDateTime
@@ -10,6 +11,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QPushButton, QFileDialog
 import datetime
 from PyQt5.QtCore import QTimer
 import random
+import matplotlib.pyplot as plt
 
 image_path1 = "./E14h481VcAUUa1t.jpg"
 image_path2 = "./highpass.png"
@@ -64,6 +66,8 @@ class Example(QWidget):
         self.update_interval = 1000     # 温度、湿度、日時を更新する間隔 [ms]
         self.fontsize = 15              # 上記の情報の文字サイズ
 
+        self.temp_log = []
+
         self.initUI()
 
 
@@ -79,6 +83,12 @@ class Example(QWidget):
         # 湿度
         self.lbl_humidity = QLabel('')
         self.lbl_humidity.setFont(QFont('Arial', self.fontsize))
+        
+        ### 学習済みモデルを読み込む
+        btn_log = QPushButton('log')             # モデルを読み込むボタン
+        btn_log.resize(btn_log.sizeHint())      # ボタンのサイズの自動設定
+        btn_log.clicked.connect(self.plot_log)  # ボタンおされた時の処理
+        
         # 日時
         self.lbl_date = QLabel('')
         self.lbl_date.setFont(QFont('Arial', self.fontsize))
@@ -104,6 +114,7 @@ class Example(QWidget):
         info_hbox = QHBoxLayout()
         info_hbox.addWidget(self.lbl_temp)
         info_hbox.addWidget(self.lbl_humidity)
+        info_hbox.addWidget(btn_log)
         info_hbox.addStretch(1)
         info_hbox.addWidget(self.lbl_date)
         info_hbox.addWidget( self.testTimeDisplay )
@@ -202,12 +213,31 @@ class Example(QWidget):
     # 温度の更新
     def update_temp(self):
         rand = random.random()
+        self.temp_log.append(rand)
         self.lbl_temp.setText( "温度 " + str(rand) + "[℃]" )
     
     # 湿度の更新
     def update_lbl_humidity(self):
         rand = random.random()
         self.lbl_humidity.setText( "湿度 " + str(rand) + "[%]" )
+        
+    def plot_log(self):
+        # 現時点のlogをプロット
+        plt.figure()
+        plt.plot(self.temp_log)
+        plt.title("temperature log")
+        plt.xlabel("")
+        plt.ylabel("℃")
+        plt.show()
+        # csvに保存
+        if not os.path.exists("./log"):
+            os.makedirs("./log")        
+        # csvに保存
+        filename = "".join( [ "./log/log_", str( "{:%m%d%s}".format( datetime.datetime.now() ) ), ".csv" ] )
+#        filename = "./log/log_{}.csv"
+        with open(filename, "w", newline="") as f:
+            w = csv.writer(f, delimiter=",")
+            w.writerow( self.temp_log )
 
     # クリックのテスト用
     def onClick(self):
