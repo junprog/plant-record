@@ -138,9 +138,10 @@ if __name__ == '__main__':
     STEPS_PER_EPOCH = TRAINSET_SIZE // BATCH_SIZE
     VALIDATION_STEPS = TESTSET_SIZE // BATCH_SIZE
 
-    checkpoint_name = "cp.ckpt"
+    #checkpoint_name = "cp.ckpt"
     checkpoint_name = "model_{epoch:06d}.h5"
-    checkpoint_name = "saved_model"
+    #checkpoint_name = "saved_model"
+
     ### 結果出力ディレクトリ作成 ###
     if not os.path.isdir(args.result_dir):
         os.mkdir(args.result_dir)
