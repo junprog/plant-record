@@ -150,6 +150,7 @@ def predict(input_img_path, weight_path):
 	img_tensor_reshape = tf.expand_dims(img_tensor, axis=0)
 
 	# model load & prediction
+	"""
 	alt_shape_model = unet(input_size, num_classes=num_classes)
 	model = tf.keras.models.load_model(weight_path)
 
@@ -157,6 +158,10 @@ def predict(input_img_path, weight_path):
 		new_layer.set_weights(layer.get_weights())
 
 	pred_mask = alt_shape_model.predict(img_tensor_reshape)
+	"""
+	model = unet(input_size, num_classes=num_classes)
+	model.load_weights(weight_path)
+	pred_mask = model.predict(img_tensor_reshape)
 
 	# save mask 
 	# save_path: output_img_path
@@ -181,6 +186,6 @@ if __name__ == '__main__':
 
 	#test
 	img_path = 'C:/Users/Junya/Downloads/89hjqj6arfb/20210521_184335231_iOS.jpg'
-	weight_path = 'D:/Junya/Documents/plant-record-res/0615-202111-unet'
+	weight_path = 'weights/0615-225649-unet'
 
 	predict(img_path, weight_path)
